@@ -4,7 +4,7 @@ import {
   encontrarDocumento,
   excluirDocumento,
   obterDocumentos,
-} from "./documentosDb.js";
+} from "./database/documentosDb.js";
 import io from "./server.js";
 
 io.on("connection", (socket) => {
