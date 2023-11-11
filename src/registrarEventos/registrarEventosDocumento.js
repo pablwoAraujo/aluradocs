@@ -5,6 +5,7 @@ import {
 } from "../database/documentosDb.js";
 import {
   adicionarConexao,
+  encontrarConexao,
   obterUsuariosDocumento,
   removerConexao,
 } from "../utils/conexoesDocumentos.js";
@@ -16,14 +17,25 @@ function registrarEventosDocumento(socket, io) {
       const documento = await encontrarDocumento(documentName);
 
       if (documento) {
-        socket.join(documentName);
+        const conexaoEncontrada = encontrarConexao(documentName, nomeUsuario);
 
-        adicionarConexao({ documentName, nomeUsuario });
-        const usuariosOnline = obterUsuariosDocumento(documentName);
+        if (!conexaoEncontrada) {
+          socket.join(documentName);
 
-        io.to(documentName).emit("usuarios_online", usuariosOnline);
+          adicionarConexao({ documentName, nomeUsuario });
 
-        callback(documento.texto);
+          socket.data = {
+            usuarioEntrou: true,
+          };
+
+          const usuariosOnline = obterUsuariosDocumento(documentName);
+
+          io.to(documentName).emit("usuarios_online", usuariosOnline);
+
+          callback(documento.texto);
+        } else {
+          socket.emit("usuario_ja_no_documento");
+        }
       }
 
       socket.on("texto_editor", async ({ text, documentName }) => {
@@ -43,10 +55,12 @@ function registrarEventosDocumento(socket, io) {
       });
 
       socket.on("disconnect", () => {
-        removerConexao(documentName, nomeUsuario);
+        if (socket.data.usuarioEntrou) {
+          removerConexao(documentName, nomeUsuario);
 
-        const usuariosOnline = obterUsuariosDocumento(documentName);
-        io.to(documentName).emit("usuarios_online", usuariosOnline);
+          const usuariosOnline = obterUsuariosDocumento(documentName);
+          io.to(documentName).emit("usuarios_online", usuariosOnline);
+        }
       });
     }
   );

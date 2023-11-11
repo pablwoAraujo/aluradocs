@@ -13,7 +13,8 @@ function obterUsuariosDocumento(nomeDocumento) {
 function removerConexao(documentName, nomeUsuario) {
   const indice = conexoesDocumentos.findIndex((conexao) => {
     return (
-      conexao.documentName === documentName && conexao.nomeUsuario === nomeUsuario
+      conexao.documentName === documentName &&
+      conexao.nomeUsuario === nomeUsuario
     );
   });
 
@@ -21,4 +22,19 @@ function removerConexao(documentName, nomeUsuario) {
     conexoesDocumentos.splice(indice, 1);
   }
 }
-export { adicionarConexao, obterUsuariosDocumento, removerConexao };
+
+function encontrarConexao(documentName, nomeUsuario) {
+  return conexoesDocumentos.find((conexao) => {
+    return (
+      conexao.documentName === documentName &&
+      conexao.nomeUsuario === nomeUsuario
+    );
+  });
+}
+
+export {
+  adicionarConexao,
+  obterUsuariosDocumento,
+  removerConexao,
+  encontrarConexao,
+};

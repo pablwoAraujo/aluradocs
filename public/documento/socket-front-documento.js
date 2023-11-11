@@ -43,4 +43,9 @@ socket.on("excluir_documento_sucesso", (documentName) => {
   alertarERedirecionar(documentName);
 });
 
+socket.on("usuario_ja_no_documento", () => {
+  alert("Documento já aberto em outra página.");
+  window.location.href = "/";
+});
+
 export { emitirTextoEditor, selecionarDocumento, emitirExcluirDocumento };
